@@ -1,0 +1,10 @@
+CreateFile
+DeviceIoControl
+ReadFile
+
+CreateEvent
+WaitForSingleObject
+
+CloseHandle
+
+GENERIC_ACCESS_RIGHTS

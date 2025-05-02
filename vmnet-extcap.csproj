@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<OutputType>Exe</OutputType>
+	<TargetFramework>net8.0</TargetFramework>
+	<RootNamespace>VMNetExtcap</RootNamespace>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<InvariantGlobalization>true</InvariantGlobalization>
+	<EnableDefaultItems>false</EnableDefaultItems>
+	<SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+	  <PublishAot>true</PublishAot>
+	  <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+	
+ <ItemGroup>
+	 <Compile Include="src/GlobalSuppressions.cs" />
+	 <Compile Include="src/Program.cs" />
+	 <Compile Include="src/VMnetUserInterface.cs" />
+ </ItemGroup>
+	
+ <ItemGroup>
+   <Content Include="NativeMethods.txt" />
+ </ItemGroup>
+	
+ <ItemGroup>
+   <None Include=".gitignore" />
+   <None Include="README.md" />
+ </ItemGroup>
+	
+ <ItemGroup>
+   <PackageReference Include="ExtcapNet" Version="1.0.0.4" />
+   <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+	 <PrivateAssets>all</PrivateAssets>
+	 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+   </PackageReference>
+ </ItemGroup>
+
+</Project>
