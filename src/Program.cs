@@ -20,7 +20,7 @@ static void VMWarePacketProducer(uint selectedVMnet, Dictionary<ConfigField, str
 		var packetLen = vmNetUserInterface.CapturePacket(packetData);
 		publisher.Send(new PacketToSend {
 			LinkLayer = LinkLayerType.Ethernet,
-			Data = new ArraySegment<byte>(packetData, 0, (int)packetLen).ToArray(),
+			Data = new ArraySegment<byte>(packetData, 0, (int)packetLen),
 			TimeFromCaptureStart = DateTime.Now.Subtract(captureStartTime)
 		});
 	}

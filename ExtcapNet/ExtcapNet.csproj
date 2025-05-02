@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Authors>theXappy (Shai S)</Authors>
     <Description>A library for developing extcap plugins for Wireshark.</Description>
     <Version>1.0.0.4</Version>

@@ -99,7 +99,7 @@ namespace ExtcapNet.CaptureInterface
 
         public override IPacketsPublisher GetPacketsPublisher(NamedPipeClientStream wsPipeClient)
         {
-            return new ExtendedPcapngPublisher(wsPipeClient, DefaultLinkLayer, _additionalLinkLayers);
+            return new PcapngPublisher(wsPipeClient, DefaultLinkLayer, _additionalLinkLayers);
         }
 
         public override Dictionary<ConfigField, string> GetCaptureConfiguration(string[] args)

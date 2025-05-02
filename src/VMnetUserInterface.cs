@@ -14,11 +14,11 @@ namespace VMNetExtcap
 	internal enum VNetUserConnectType : uint { 
 		Invalid = 0,
 		VMnet = 1, // VMnet[X]
-		PVN = 2 
+		PVN = 2 // I think this is a VM ID? I recall seeing a similar format in .vmxf
 	};
 
 	/// <summary>
-	/// Struct provided to driver via IOCTL to request a particular vmnet instance
+	/// Struct provided to driver via IOCTL to bind to a network.
 	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	internal unsafe struct VNETUserConnectRequest {
@@ -28,18 +28,16 @@ namespace VMNetExtcap
 		// This is the ID of the vmnet you want to requet
 		// Used if RequestType == VMnet
 		public uint vmnetId;
-		
-		// Whatever thee are is used for RequestType == PVN
-		public fixed uint pvnSrc[4];
-		public fixed uint pvnDst[4]; // Not used, just to make sure its happy
+
+		// Used if RequestType == PVN
+		public fixed uint pvnAddress[8];
 
 		public VNETUserConnectRequest() {
 			version = 1;
 			requestType = VNetUserConnectType.Invalid;
 			vmnetId = 0xff_ff_ff_ff;
 			for (var i = 0; i < 4; ++i) {
-				pvnSrc[i] = 0;
-				pvnDst[i] = 0;
+				pvnAddress[i] = 0;
 			}
 		}
 	};
@@ -160,15 +158,15 @@ namespace VMNetExtcap
 				// "promiscious" mode? Dunno.
 				SetInterfaceFlags(9);
 
-				// Once we've gotten this far, it's time to create an (manual-reset)event so that we can
-				// sleep instead of constantly polling for a packet.
+				// Create an (manual-reset) event that the vmnetuserif driver will set
+				// so that we can sleep instead of constantly polling for a new packet.
 				hPacketRecievedEvent = Win32API.CreateEvent(null, true, false, (string?)null);
 				if (hPacketRecievedEvent.IsInvalid) {
 					throw new Win32Exception("Failed to create packet recieve event? How'd that happen.");
 				}
 
 				// Finally, give the driver the handle to the event we created,
-				// so we know when packets are actually ready.
+				// so it can.. well, signal it.
 				var packetRecievedHandle = hPacketRecievedEvent.DangerousGetHandle();
 				if (!Win32API.DeviceIoControl(hVmUser, Constants.VNETUSERIF_SETEVENT_IOCTL, &packetRecievedHandle, (uint)sizeof(nint), null, 0, &dummyReturned, null))
 					throw new Win32Exception("Could not give IOCTL to vmnetuserif");

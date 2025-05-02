@@ -8,8 +8,8 @@ namespace ExtcapNet.PacketPublish
         /// Sends with the wrapper's 'default link layer' and no timestamp
         /// </summary>
         /// <param name="data">Packet bytes</param>
-        void Send(byte[] data);
-        void Send(byte[] data, LinkLayerType linkLayer);
+        void Send(ReadOnlySpan<byte> data);
+        void Send(ReadOnlySpan<byte> data, LinkLayerType linkLayer);
         void Send(PacketToSend pkt);
     }
 }
