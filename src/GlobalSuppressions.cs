@@ -1,4 +1,4 @@
-﻿// This file is a part of vmnet-excap.
+﻿// This file is a part of vmnet-extcap.
 // SPDX-License-Identifier: MIT
 
 // This file is used by Code Analysis to maintain SuppressMessage

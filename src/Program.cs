@@ -1,4 +1,4 @@
-﻿// This file is a part of vmnet-excap.
+﻿// This file is a part of vmnet-extcap.
 // SPDX-License-Identifier: MIT
 
 using ExtcapNet.Config;
@@ -13,14 +13,10 @@ static void VMWarePacketProducer(uint selectedVMnet, Dictionary<ConfigField, str
 	var captureStartTime = DateTime.Now;
 
 	vmNetUserInterface.RequestVMnet(selectedVMnet);
+	vmNetUserInterface.BeginPacketCapture();
 
-	uint packetLen = 0;
 	while (true) {
-		try {
-			packetLen = vmNetUserInterface.CapturePacket(packetData);
-		} catch (EndOfCaptureException) {
-			break;
-		}
+		var packetLen = vmNetUserInterface.CapturePacket(packetData);
 
 		// The only way the packet length can be 0 is if the event
 		// wait timed out. Therefore, in that case, we just try again.

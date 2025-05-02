@@ -1,4 +1,4 @@
-# vmnet-excap
+# vmnet-extcap
 
 This is a [Wireshark extcap](https://www.wireshark.org/docs/man-pages/extcap.html) plugin which allows capturing packets from a VMware VMnet. 
 
