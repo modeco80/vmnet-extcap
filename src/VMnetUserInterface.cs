@@ -122,11 +122,11 @@ namespace VMNetExtcap
 		}
 
 		/// <summary>
-		/// Requests a particular VMnet network by VMnet index.
+		/// Connects to a particular VMnet network
 		/// </summary>
-		/// <param name="vmnetIndex">The index.</param>
+		/// <param name="vmnetIndex">The VMnet to connect to.</param>
 		/// <exception cref="Win32Exception">Thrown if DeviceIoControl() fails.</exception>
-		public void RequestVMnet(uint vmnetIndex) {
+		public void ConnectToVMnet(uint vmnetIndex) {
 			uint dummyReturned = 0;
 
 			// Create the request structure.
@@ -136,7 +136,7 @@ namespace VMNetExtcap
 
 			unsafe {
 				if (!Win32API.DeviceIoControl(hVmUser, Constants.VNETUSERIF_CONNECT_IOCTL, &request, (uint)Marshal.SizeOf<VNETUserConnectRequest>(), null, 0, &dummyReturned, null))
-					throw new Win32Exception("Couldn't request VNET from vmnetuserif driver");
+					throw new Win32Exception("Couldn't connect to VMnet");
 			}
 		}
 
@@ -144,7 +144,7 @@ namespace VMNetExtcap
 			uint dummyReturned = 0;
 			unsafe {
 				if (!Win32API.DeviceIoControl(hVmUser, Constants.VNETUSERIF_SETIFFLAGS_IOCTL, &flags, (uint)Marshal.SizeOf<uint>(), null, 0, &dummyReturned, null))
-					throw new Win32Exception("UNK1 ioctl failed");
+					throw new Win32Exception("SETIFFLAGS ioctl failed");
 			}
 		}
 
@@ -160,7 +160,7 @@ namespace VMNetExtcap
 				// "promiscious" mode? Dunno.
 				SetInterfaceFlags(9);
 
-				// Once we've gotten this far, it's time to create an event so that we can
+				// Once we've gotten this far, it's time to create an (manual-reset)event so that we can
 				// sleep instead of constantly polling for a packet.
 				hPacketRecievedEvent = Win32API.CreateEvent(null, true, false, (string?)null);
 				if (hPacketRecievedEvent.IsInvalid) {
@@ -169,18 +169,18 @@ namespace VMNetExtcap
 
 				// Finally, give the driver the handle to the event we created,
 				// so we know when packets are actually ready.
-				nint handle = hPacketRecievedEvent.DangerousGetHandle();
-				if (!Win32API.DeviceIoControl(hVmUser, Constants.VNETUSERIF_SETEVENT_IOCTL, &handle, (uint)sizeof(nint), null, 0, &dummyReturned, null))
+				var packetRecievedHandle = hPacketRecievedEvent.DangerousGetHandle();
+				if (!Win32API.DeviceIoControl(hVmUser, Constants.VNETUSERIF_SETEVENT_IOCTL, &packetRecievedHandle, (uint)sizeof(nint), null, 0, &dummyReturned, null))
 					throw new Win32Exception("Could not give IOCTL to vmnetuserif");
 			}
 		}
 
 		/// <summary>
 		/// Captures a single packet.
-		/// BeginCapture() must have been called first.
+		/// BeginPacketCapture() must have been called first.
 		/// This function does not return until a packet has definitively been captured.
 		/// </summary>
-		/// <param name="buffer"></param>
+		/// <param name="buffer">A buffer that packet data is read into. Should be 0x640 bytes long.</param>
 		/// <returns>The size of the packet.</returns>
 		/// <exception cref="Win32Exception">If ReadFile() fails.</exception>
 		public uint CapturePacket(Span<byte> buffer) {
@@ -202,7 +202,6 @@ namespace VMNetExtcap
 				}
 			}
 			
-
 			return packetSize;
 		}
 

@@ -12,17 +12,12 @@ static void VMWarePacketProducer(uint selectedVMnet, Dictionary<ConfigField, str
 	using var vmNetUserInterface = new VMnetUserInterface();
 	var captureStartTime = DateTime.Now;
 
-	vmNetUserInterface.RequestVMnet(selectedVMnet);
+	// Setup capture
+	vmNetUserInterface.ConnectToVMnet(selectedVMnet);
 	vmNetUserInterface.BeginPacketCapture();
 
 	while (true) {
 		var packetLen = vmNetUserInterface.CapturePacket(packetData);
-
-		// The only way the packet length can be 0 is if the event
-		// wait timed out. Therefore, in that case, we just try again.
-		if (packetLen == 0)
-			continue;
-
 		publisher.Send(new PacketToSend {
 			LinkLayer = LinkLayerType.Ethernet,
 			Data = new ArraySegment<byte>(packetData, 0, (int)packetLen).ToArray(),
