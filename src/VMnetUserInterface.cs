@@ -155,34 +155,22 @@ namespace VMNetExtcap
 			}
 		}
 
-		public uint CapturePacket(Span<byte> buffer) { 
-			var waitResult = Win32API.WaitForSingleObject(hPacketRecievedEvent, 33);
-			if (waitResult == WAIT_EVENT.WAIT_TIMEOUT) {
-				// No packet obtained, but not an error. Just have to try again :)
-				return 0;
-			} else if (waitResult == WAIT_EVENT.WAIT_FAILED) {
-				throw new InvalidOperationException("End of packet capture?");
-			} else if (waitResult == WAIT_EVENT.WAIT_OBJECT_0) {
-				// The driver has signaled to us that we do have a packet.
-				// Let's read it.
-
-				uint packetSize = 0;
-				BOOL ok = false;
-				unsafe {
-					ok = Win32API.ReadFile(hVmUser, buffer, &packetSize, null);
-					if (!ok) {
-						throw new Win32Exception("Could not read captured packet");
-					}
-
-					if (packetSize == 0) {
-						throw new EndOfCaptureException();
-					}
+		public uint CapturePacket(Span<byte> buffer) {
+			Win32API.WaitForSingleObject(hPacketRecievedEvent, 33);
+			uint packetSize = 0;
+			BOOL ok = false;
+			unsafe {
+				ok = Win32API.ReadFile(hVmUser, buffer, &packetSize, null);
+				if (!ok) {
+					throw new Win32Exception("Could not read captured packet");
 				}
 
-				return packetSize;
+				if (packetSize == 0) {
+					return 0;
+				}
 			}
 
-			throw new InvalidOperationException("How did you get here?");
+			return packetSize;
 		}
 
 		void IDisposable.Dispose() {
