@@ -28,7 +28,7 @@ static void VMWarePacketProducer(Dictionary<ConfigField, string> config, IPacket
 	while (true) {
 		try {
 			packetLen = vmNetUserInterface.CapturePacket(packetData);
-		} catch (InvalidOperationException) {
+		} catch (EndOfCaptureException) {
 			break;
 		}
 
