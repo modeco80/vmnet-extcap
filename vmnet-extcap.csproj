@@ -17,6 +17,7 @@
   </PropertyGroup>
 	
  <ItemGroup>
+	 <ProjectReference Include="ExtcapNet/ExtcapNet.csproj" />
 	 <Compile Include="src/GlobalSuppressions.cs" />
 	 <Compile Include="src/Program.cs" />
 	 <Compile Include="src/VMnetUserInterface.cs" />

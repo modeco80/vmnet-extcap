@@ -40,7 +40,7 @@ static void VMWarePacketProducer(Dictionary<ConfigField, string> config, IPacket
 		publisher.Send(new PacketToSend {
 			LinkLayer = LinkLayerType.Ethernet,
 			Data = new ArraySegment<byte>(packetData, 0, (int)packetLen).ToArray(),
-			TimeFromCaptureStart = DateTime.Now - captureStartTime,
+			TimeFromCaptureStart = DateTime.Now.Subtract(captureStartTime)
 		});
 	}
 }
