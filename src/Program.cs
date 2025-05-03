@@ -6,22 +6,25 @@ using ExtcapNet.CaptureInterface;
 using ExtcapNet.PacketPublish;
 using VMNetExtcap;
 using ExtcapNet;
+using System.Diagnostics;
 
 static void VMWarePacketProducer(uint selectedVMnet, Dictionary<ConfigField, string> config, IPacketsPublisher publisher) {
 	var packetData = new byte[0x640];
 	using var vmNetUserInterface = new VMnetUserInterface();
-	var captureStartTime = DateTime.Now;
+	var captureStartTimer = Stopwatch.StartNew();
 
-	// Setup capture
+	// Setup capture by binding to the particular VMnet and
+	// initalizing it for packet capturing.
 	vmNetUserInterface.ConnectToVMnet(selectedVMnet);
 	vmNetUserInterface.BeginPacketCapture();
 
+	// Main loop; capture packets forever
 	while (true) {
 		var packetLen = vmNetUserInterface.CapturePacket(packetData);
 		publisher.Send(new PacketToSend {
 			LinkLayer = LinkLayerType.Ethernet,
 			Data = new ArraySegment<byte>(packetData, 0, (int)packetLen),
-			TimeFromCaptureStart = DateTime.Now.Subtract(captureStartTime)
+			TimeFromCaptureStart = captureStartTimer.Elapsed
 		});
 	}
 }
