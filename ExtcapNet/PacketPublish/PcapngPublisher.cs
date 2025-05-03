@@ -90,7 +90,7 @@ namespace ExtcapNet.PacketPublish
                 ts = pkt.TimeFromCaptureStart.Value;
             }
 
-            SendImpl(pkt.Data, ifaceId, new TimestampHelper((uint)Math.Abs(ts.TotalSeconds), (uint)(Math.Abs(ts.Milliseconds) * 1000)), pkt.Comment);
+            SendImpl(pkt.Data, ifaceId, new TimestampHelper((uint)ts.TotalSeconds, (uint)ts.Microseconds), pkt.Comment);
         }
 
 
